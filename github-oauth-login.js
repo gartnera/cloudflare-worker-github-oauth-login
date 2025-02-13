@@ -20,10 +20,14 @@ async function handle(request) {
 
   // redirect GET requests to the OAuth login page on github.com
   if (request.method === "GET") {
-    return Response.redirect(
-      `https://github.com/login/oauth/authorize?client_id=${client_id}`,
-      302
-    );
+    const url = new URL(request.url);
+    const redirect_uri = url.searchParams.get('redirect_uri');
+    const githubUrl = new URL('https://github.com/login/oauth/authorize');
+    githubUrl.searchParams.set('client_id', client_id);
+    if (redirect_uri) {
+      githubUrl.searchParams.set('redirect_uri', redirect_uri);
+    }
+    return Response.redirect(githubUrl.toString(), 302);
   }
 
   try {
@@ -61,3 +65,4 @@ async function handle(request) {
     });
   }
 }
+
